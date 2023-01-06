@@ -16,24 +16,23 @@ export default function Home() {
     requestName();
   }, [])
 
-  const requestName = () => {
-    fetch('http://localhost:3000/request')
-    .then(response => response.json())
-    .then(data => setName(data.name));
+  const requestName = async () => {
+    const response = await axios({
+      method: 'get',
+      url: `http://localhost:3000/api/request`,
+    })
+
+    setName(response['name'])
   }
 
   const locateName = async () => {
     console.log("Web app locating ", name)
     const response = await axios({
       method: 'get',
-      url: `https://ono.4b.rs/v1/jur?key=${process.env.API_KEY}&name=${name}&type=surname`,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-      }
+      url: `http://localhost:3000/api/locate/${name}`,
     })
-    
-    console.log(response.data[0]['jurisdiction'])
+
+    setLocation(response['jurisdiction'])
   }
   
   
