@@ -19,20 +19,19 @@ export default function Home() {
   const requestName = async () => {
     const response = await axios({
       method: 'get',
-      url: `http://localhost:3000/api/request`,
+      url: `https://name-game-backend-dangush.vercel.app/api/request`,
     })
-
-    setName(response['name'])
+    setName(response.data['name'])
   }
 
   const locateName = async () => {
     console.log("Web app locating ", name)
     const response = await axios({
       method: 'get',
-      url: `http://localhost:3000/api/locate/${name}`,
+      url: `https://name-game-backend-dangush.vercel.app/api/locate/${name}`,
     })
 
-    setLocation(response['jurisdiction'])
+    setLocation(response.data['jurisdiction'])
   }
   
   

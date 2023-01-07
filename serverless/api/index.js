@@ -1,6 +1,14 @@
 const app = require('express')();
 const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
+const cors = require('cors');
+
+
+// let corsOptions = {
+//   origin : ['*'],
+// }
+app.use(cors());
 
 
 app.get('/api/request', (req, res) => {
@@ -8,38 +16,40 @@ app.get('/api/request', (req, res) => {
   res.json({"name": name})
 });
 
-app.get('/api/locate/:name', async (req, res) => {
+app.get('/api/locate/:name', (req, res) => {
   const { name } = req.params;
 
-  const response = await axios.get('https://ono.4b.rs/v1/jur', {
+  console.log(process.env.API_KEY);
+  
+  axios.get('https://ono.4b.rs/v1/jur', {
       params: {
           'key': process.env.API_KEY,
           'name': name,
           'type': 'surname'
       }
-  });
+  })
+    .then(resp => {
+      console.log(resp.status);
+      console.log(resp.statusText);
+      console.log(resp.data);
+      res.json(resp.data.jurisdictions[0]);
+    })
+    .catch(error => console.error(error));
 
-    // Response is in the form of: 
+  // Response is in the form of: 
 
-    // "jurisdictions": [
-    //   {
-    //       "incidence": 797086,
-    //       "percent": "1.534687955",
-    //       "ratio": 65,
-    //       "rank": 6,
-    //       "jurisdiction": "Myanmar",
-    //       "iso": "mm"
-    //   }
-    // ]
+  // "jurisdictions": [
+  //   {
+  //       "incidence": 797086,
+  //       "percent": "1.534687955",
+  //       "ratio": 65,
+  //       "rank": 6,
+  //       "jurisdiction": "Myanmar",
+  //       "iso": "mm"
+  //   }
+  // ]
 
-  console.log(response.status, response.statusText);
 
-  if (response.status == 200) {
-    console.log(response.data.jurisdictions[0]);
-    res.json(response.data.jurisdictions[0]);
-  } else {
-    res.status(500).send({message: response.statusText});  
-  }
 });
 
 
@@ -58,7 +68,9 @@ function randomName() {
   // Load CSV:
 
   // Read the file contents into a string
-  const fileContents = fs.readFileSync("names3.csv", 'utf8');
+  const file = path.join(process.cwd(), 'names3.csv');
+
+  const fileContents = fs.readFileSync(file, 'utf8');
   // Split the string by newlines to get an array of rows
   const rows = fileContents.split('\n');
   // Map the rows array to a 2D array, splitting each row by commas to get the values
