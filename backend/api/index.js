@@ -4,11 +4,17 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 
+const port = process.env.PORT || 8080;
+
+app.use(cors());
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
 // let corsOptions = {
 //   origin : ['*'],
 // }
-app.use(cors());
 
 
 app.get('/api/request', (req, res) => {
@@ -32,7 +38,10 @@ app.get('/api/locate/:name', (req, res) => {
       console.log(resp.status);
       console.log(resp.statusText);
       console.log(resp.data);
-      res.json(resp.data.jurisdictions[0]);
+      res.json({
+        jurisdictionData: resp.data.jurisdictions[0],
+        remainingCredits: resp.data.remainingCredits
+      });
     })
     .catch(error => console.error(error));
 
@@ -52,8 +61,11 @@ app.get('/api/locate/:name', (req, res) => {
 
 });
 
-
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+});
  
+
 function randomName() {
   // Pick a column from names.csv
   let col = Math.floor(Math.random() * 26);
